@@ -1,5 +1,7 @@
 #include "biblioteca.h"
 
+  // Construtor da classe grafo
+  // Recebe como entredas o nome do arquivo (string arquivo) e um parametro que determina se as operacoes serao feitas com matriz ou vetor de adjacencia (int opcao)
   grafo::grafo(string arquivo, int opcao) {
 
   escolha = opcao;
@@ -42,6 +44,8 @@
    
 }
 
+// Funcao utilizada para calcular os graus medio, mediano, maximo e minimo do grafo
+// Escreve em um arquivo "output.txt" as informacoes calculadas
 void grafo::Calculo_Graus() {
 
   sort(grau_vertices.begin(), grau_vertices.end());
@@ -67,6 +71,7 @@ void grafo::Calculo_Graus() {
     grau_mediana=grau_vertices[meio];
   }
 
+  // Escrita das informacoes sobre graus no arquivo "output.txt"
   ofstream outputFile("output.txt");
   if (outputFile.is_open()) {
         outputFile << "Numero de vertices: "<<num_vertices<< endl;
@@ -80,6 +85,9 @@ void grafo::Calculo_Graus() {
   }
 }
 
+// Funcao que realiza a Breadth First Search em um grafo a partir de um vertice
+// Recebe como parametros o vertice inicial (int s), um vetor de pais (vector<int> &pai), um vetor de niveis (vector<int> &nivel) e um vetor de explorador (vector<int> &explorados)
+// Escreve em um arquivo "bfs.txt" as informacoes encontradas sobre pai e nivel
 int grafo::BFS(int s, vector<int> &pai, vector<int> &nivel,
                       vector<int> &explorados) {
 
@@ -88,6 +96,7 @@ int grafo::BFS(int s, vector<int> &pai, vector<int> &nivel,
 
   int v, u;
 
+  // Definicao do pai do vertice inicial e marcacao dele como explorado
   pai[s - 1] = -1;
   explorados[s - 1] = 1;
 
@@ -146,12 +155,16 @@ int grafo::BFS(int s, vector<int> &pai, vector<int> &nivel,
   
 }
 
+// Funcao que realiza a Depth First Search em um grafo a partir de um vertice
+// Recebe como parametros o vertice inicial (int s), um vetor de pais (vector<int> &pai), um vetor de niveis (vector<int> &nivel) e um vetor de explorador (vector<int> &explorados)
+// Escreve em um arquivo "dfs.txt" as informacoes encontradas sobre pai e nivel
 int grafo::DFS(int s, vector<int> &pai, vector<int> &nivel,
                       vector<int> &explorados) {
 
   stack<int> pilha;
 
   int v, u;
+  // Definicao do pai do vertice inicial e marcacao dele como explorado
   pai[s - 1] = -1;
   explorados[s - 1] = 1;
   pilha.push(s);
@@ -200,6 +213,7 @@ int grafo::DFS(int s, vector<int> &pai, vector<int> &nivel,
   return 0;
 }
 
+// Verifica a quantidade de componentes conexas a partir da execucao de BFSs e os ordena de forma decrescente de tamanho
 int grafo::Componente_Conexa(){
 
   vector<int> pais(num_vertices, 0);
