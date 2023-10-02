@@ -213,7 +213,7 @@ int grafo::DFS(int s, vector<int> &pai, vector<int> &nivel,
   return 0;
 }
 
-// Verifica a quantidade de componentes conexas a partir da execucao de BFSs e os ordena de forma decrescente de tamanho
+// Verifica a quantidade de componentes conexas a partir da execucao de BFSs e os ordena de forma decrescente de tamanho de cada componente
 int grafo::Componente_Conexa(){
 
   vector<int> pais(num_vertices, 0);
@@ -259,6 +259,9 @@ int grafo::Componente_Conexa(){
   return 0;
 }
 
+// Calcula o diametro do grafo a partir da execucao de n BFSs e salva a maior distancia encontrada a cada execucao
+// Aproxima o diametro caso o grafo possua mais que 5000 vertices. Nesse caso a execucao da BFS ocorre a partir de um vertice aleatorio
+// Retorna o diametro encontrado
 int grafo::Diametro(){
   
   int diametro = -1, limite_bfs, inicio;
@@ -291,6 +294,9 @@ int grafo::Diametro(){
   return diametro; 
 }
 
+// Determina a distancia entre dois vertices
+// Recebe como argumento os dois vertices que terao a distancia de um ao outro calculada
+// Retorna a distancia entre os dois vertices caso elas estejam na mesma componente e -1 caso eles estejam em componentes diferentes
 int grafo::Distancia(int v1, int v2){
   vector<int> nivel(num_vertices, 0);
   vector<int> pai(num_vertices, 0);
