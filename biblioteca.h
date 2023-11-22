@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <unistd.h>
+
 
 using namespace std;
 
@@ -24,6 +26,8 @@ public:
   vector<vector<int>> matriz_adj;
   vector<vector<int>> vetor_adj;
   vector<vector<pair<int, float>>> vetor_adj_peso;
+  vector<vector<pair<int, pair<float,int>>>> vetor_adj_fluxo;
+
   vector<int> grau_vertices;
   vector<float> pesos;
 
@@ -32,11 +36,14 @@ public:
   int Dijkstra(int, vector<int> &, vector<float> &);
   int Dijkstra_Heap(int, vector<int> &, vector<float> &);
   string Caminho_Min(int, vector<int> &);
+  
+  int Ford_Fulkerson(int, int, int);
+  int Gargalo(vector<int>);  
 
   void Constroi_Grafo(ifstream &);
 
   void Calculo_Graus();
   int Diametro();
-  int Distancia(int v1, int v2);
+  int Distancia(int v1, int v2, vector<int>&);
   int Componente_Conexa();
 };
