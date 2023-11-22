@@ -20,6 +20,10 @@ grafo::grafo(string arquivo, int opcao) {
   }
   if (escolha == 4) {
     vetor_adj.resize(num_vertices);
+  }  
+  // A estrutura do grafo de fluxos possui o mesmo formato da com pesos
+  if (escolha == 5) {
+    vetor_adj_peso.resize(num_vertices);
   }
 
   while (file >> v1 >> v2 >> peso) {
@@ -49,10 +53,128 @@ grafo::grafo(string arquivo, int opcao) {
       vetor_adj[v2 - 1].push_back(v1);
     
     }
-   
+    if (escolha == 5) {
+        // Como o grafo eh direcionado, apenas uma aresta eh adicionada 
+        vetor_adj_peso[v1 - 1].push_back(make_pair(v2, peso));
+    }
+  }
+}
+
+int grafo::Ford_Fulkerson(int s, int t, int usar_arquivo) {
+
+  int result;
+  int fluxo_maximo = 0;
+  vetor_adj_fluxo.resize(num_vertices);// O(n)
+  
+  // Preenchendo vetor de fluxo com as arestas diretas e reversas
+  for (int i = 0; i < num_vertices; i++) {  // O(m)
+    for (int j = 0; j < vetor_adj_peso[i].size(); j++) { 
+   //Aresta direta  
+          vetor_adj_fluxo[i].push_back(make_pair(vetor_adj_peso[i][j].first, make_pair(0, vetor_adj_peso[i][j].second))); 
+      // Aresta reversa
+      vetor_adj_fluxo[vetor_adj_peso[i][j].first-1].push_back(make_pair(i+1, make_pair(vetor_adj_peso[i][j].second ,vetor_adj_peso[i][j].second))); 
+      
+    }
+}
+  
+   do {
+
+    int gargalo;
+
+    vector<int> pais(num_vertices, 0); // O(n)
+    result = Distancia(s, t, pais); // O(m+n)
+     
+    if (result != -1){
+     
+  vector<int> caminho;
+  caminho.push_back(t); // O(1)
+  
+  int pai = pais[t-1];
+
+  while (pai != -1) { // O(n)
+       caminho.push_back(pai);
+       pai --;
+       pai = pais[pai];
+     }
+
+    gargalo = Gargalo (caminho); 
+//O(m)
+
+    // Atualizando os fluxos nas arestas diretas e reversas
+    for (int i = caminho.size()-1; i >= 0; i--) { // O(m)
+      for (int j = 0; j < vetor_adj_fluxo[caminho[i]-1].size(); j++){
+        if (vetor_adj_fluxo[caminho[i]-1][j].first == caminho[i-1]) {
+          
+          vetor_adj_fluxo[caminho[i]-1][j].second.first += gargalo;         
+          
+          for (int k = 0; k < vetor_adj_fluxo[caminho[i-1]-1].size(); k++) {
+            if (vetor_adj_fluxo[caminho[i-1]-1][k].first == caminho[i]) {
+              vetor_adj_fluxo[caminho[i-1]-1][k].second.first -= gargalo;
+              
+            }
+          }
+          
+        }
+      }
+    }
+
+  } } while (result != -1);// Fim do while
+  // O(C)
+  // O(C(2m +n + m+n)) = O(C(m+n))
+
+  // Calculo do fluxo maximo
+  for (int i = 0; i < num_vertices; i++){
+   for(int j = 0; j < vetor_adj_fluxo[i].size(); j++) {
+      
+       if (vetor_adj_fluxo[i][j].first == t) {
+         fluxo_maximo += vetor_adj_fluxo[i][j].second.first;
+         
+       }
+    }
+  }
+  cout << "fluxo maximo: " << fluxo_maximo <<endl;
+ 
+
+  if (usar_arquivo == 1){
+   ofstream outputFile("ford_fulkerson.txt");
+
+   if (outputFile.is_open()) {
+
+     for (int i = 0; i < num_vertices; i++){
+      for(int j = 0; j < vetor_adj_peso[i].size(); j++) {
+        for (int k = 0; k < vetor_adj_fluxo[i].size(); k++) {
+          if (vetor_adj_peso[i][j].first == vetor_adj_fluxo[i][k].first) {
+            outputFile << i+1 << " " << vetor_adj_fluxo[i][k].first << " " << vetor_adj_fluxo[i][k].second.first << " " << endl;
+          }
+        }
+      }
+     }
+   }
+     outputFile.close();
   }
   
+   return fluxo_maximo;
 }
+
+int grafo::Gargalo(vector<int> caminho) {
+  
+  int gargalo = INT_MAX;
+  
+   for (int i = caminho.size()-1; i >= 0; i--) { 
+    for (int j = 0; j < vetor_adj_fluxo[caminho[i]-1].size(); j++){
+      int vizinho, capacidade, fluxo = 0;
+      vizinho = vetor_adj_fluxo[caminho[i]-1][j].first;
+      capacidade = vetor_adj_fluxo[caminho[i]-1][j].second.second;
+      fluxo = vetor_adj_fluxo[caminho[i]-1][j].second.first;
+      
+      if ((vizinho == caminho[i-1]) && (capacidade- fluxo < gargalo) && (capacidade- fluxo > 0)) {
+        gargalo = vetor_adj_fluxo[caminho[i]-1][j].second.second- vetor_adj_fluxo[caminho[i]-1][j].second.first;
+      }
+    }
+  } 
+  return gargalo;
+}
+
 
 int grafo::Dijkstra_Heap(int s, vector<int> &pai, vector<float> &dist) {
   if (peso_negativo == 0) {
@@ -229,6 +351,23 @@ int grafo::BFS(int s, vector<int> &pai, vector<int> &nivel,
       }
     }
 
+    else if (escolha == 5){
+          for (unsigned int i = 0; i < vetor_adj_fluxo[v - 1].size(); i++) {
+
+            if(vetor_adj_fluxo[v - 1][i].second.second - vetor_adj_fluxo[v - 1][i].second.first >0){
+
+              u = vetor_adj_fluxo[v - 1][i].first;
+                          
+              if (explorados[u - 1] != 1) {
+                explorados[u - 1] = 1;
+                fila.push(u);
+                pai[u - 1] = v;  
+                nivel[u - 1] = nivel[v - 1] + 1;
+              }
+            }
+          }
+        }
+
     else {
       for (unsigned int i = 0; i < vetor_adj[v - 1].size(); i++) {
         u = vetor_adj[v - 1][i];
@@ -241,15 +380,6 @@ int grafo::BFS(int s, vector<int> &pai, vector<int> &nivel,
         }
       }
     }
-  }
-
-  ofstream outputFile("bfs.txt");
-  if (outputFile.is_open()) {
-    for (int i = 0; i < num_vertices; i++) {
-      outputFile << i + 1 << " " << pai[i] << " " << nivel[i] << endl;
-    }
-
-    outputFile.close();
   }
 
   return 0;
@@ -380,13 +510,12 @@ int grafo::Diametro() {
   return diametro;
 }
 
-int grafo::Distancia(int v1, int v2) {
+int grafo::Distancia(int v1, int v2, vector<int> &pais) {
   vector<int> nivel(num_vertices, 0);
-  vector<int> pai(num_vertices, 0);
   vector<int> explorados(num_vertices, 0);
 
-  BFS(v1, pai, nivel, explorados);
-
+  BFS(v1, pais, nivel, explorados);
+  
   if (explorados[v2 - 1] == 1)
     return (nivel[v2 - 1]);
 
