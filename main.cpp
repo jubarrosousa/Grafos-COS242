@@ -47,7 +47,7 @@ int main() {
     arq_texto = arq_texto + ".txt";
   }
   
-  cout << "Voce deseja trabalhar com grafos com ou sem pesos? \n 1 -" " Com pesos \n 2 - Sem pesos"<< endl;
+  cout << "Voce deseja trabalhar com grafos com ou sem pesos? \n 1 -" " Com pesos \n 2 - Sem pesos \n 3 - Grafo direcionado"<< endl;
   cin >> escolha;
 
 
@@ -138,7 +138,7 @@ int main() {
 
   }
     
-  else {
+  else if (escolha == 2) {
     
     int n, numero_vertice, numero_vertice2, opcao;
     cout << "Voce deseja trabalhar com matriz ou vetor de adjacência? \n 1 -"
@@ -184,7 +184,7 @@ int main() {
         cin >> numero_vertice;
         cout << "Insira o numero do vertice 2: ";
         cin >> numero_vertice2;
-        cout << grafo.Distancia(numero_vertice, numero_vertice2) << endl;
+        cout << grafo.Distancia(numero_vertice, numero_vertice2, pai) << endl;
         break;
   
       case 4:
@@ -204,6 +204,30 @@ int main() {
       }
   
     } while (opcao != 6);
+  }
+
+  else if(escolha == 3) {
+    int n, numero_vertice, numero_vertice2, usar_arquivo, fluxo_maximo = 0;
+    
+    escolha = 5;
+
+    cout << "Insira o numero do vertice a ser utilizado como inicial: ";
+    cin >> numero_vertice;
+    cin.ignore(50, '\n');
+
+      cout << "Insira o numero do vertice a ser utilizado como final: ";
+      cin >> numero_vertice2;
+      cin.ignore(50, '\n');
+    
+    cout << "Deseja salvar o fluxo nas arestas em disco? \n" << "1- Sim \n" << "2- Nao" <<endl;
+    
+    cin >> usar_arquivo;
+    cin.ignore(50, '\n');
+    
+    
+    grafo grafo(arq_texto, escolha);
+    
+    fluxo_maximo = grafo.Ford_Fulkerson(numero_vertice, numero_vertice2, usar_arquivo);    
   }
   return 0;
 }
