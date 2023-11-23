@@ -56,11 +56,10 @@ int main() {
     int resultado = 0;
     int numero_vertice_inicial = 1;
     int numero_vertice_final = 2;
-    int n, opcao_djikstra;
+    int opcao_djikstra;
     string caminho;
 
     grafo grafo(arq_texto, escolha);
-    n = grafo.num_vertices;
 
     do {
     mostrarMenu2();
@@ -207,7 +206,7 @@ int main() {
   }
 
   else if(escolha == 3) {
-    int n, numero_vertice, numero_vertice2, usar_arquivo, fluxo_maximo = 0;
+    int numero_vertice, numero_vertice2, usar_arquivo=0; 
     
     escolha = 5;
 
@@ -226,8 +225,13 @@ int main() {
     
     
     grafo grafo(arq_texto, escolha);
+
+    int fluxo_maximo = 0;
     
-    fluxo_maximo = grafo.Ford_Fulkerson(numero_vertice, numero_vertice2, usar_arquivo);    
+    fluxo_maximo = grafo.Ford_Fulkerson(numero_vertice, numero_vertice2, usar_arquivo); 
+    cout << "O fluxo maximo é: " << fluxo_maximo << endl;
   }
   return 0;
 }
+
+
